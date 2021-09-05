@@ -61,6 +61,8 @@ export const parseQueryPageOptions = async (ctx, next, type = '') => {
     options.take = config.queryMediaRefsLimit
   } else if (type === 'playlists') {
     options.take = config.queryPlaylistsLimit
+  } else if (type === 'podcast-lists') {
+    options.take = config.queryPodcastListsLimit
   } else if (type === 'podcasts') {
     options.take = config.queryPodcastsLimit
   } else if (type === 'users') {

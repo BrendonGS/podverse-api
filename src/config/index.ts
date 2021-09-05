@@ -30,6 +30,7 @@ export interface Config {
   queryEpisodesLimit: number
   queryMediaRefsLimit: number
   queryPlaylistsLimit: number
+  queryPodcastListsLimit: number
   queryPodcastsLimit: number
   queryUsersLimit: number
   queryUserHistoryItemsLimit: number
@@ -92,6 +93,7 @@ const queryCategoriesLimit = process.env.QUERY_CATEGORIES_LIMIT || '20'
 const queryEpisodesLimit = process.env.QUERY_EPISODES_LIMIT || '20'
 const queryMediaRefsLimit = process.env.QUERY_MEDIA_REFS_LIMIT || '20'
 const queryPlaylistsLimit = process.env.QUERY_PLAYLISTS_LIMIT || '20'
+const queryPodcastListsLimit = process.env.QUERY_PODCAST_LISTS_LIMIT || '20'
 const queryPodcastsLimit = process.env.QUERY_PODCASTS_LIMIT || '20'
 const queryUsersLimit = process.env.QUERY_USERS_LIMIT || '20'
 const queryUserHistoryItemsLimit = process.env.QUERY_USER_HISTORY_ITEMS_LIMIT || '20'
@@ -148,7 +150,6 @@ const podcastIndexConfig = {
 }
 
 const websiteDomain = process.env.WEBSITE_DOMAIN || ''
-
 const minimumMobileVersion = process.env.MINIMUM_MOBILE_VERSION || ''
 
 const config: Config = {
@@ -179,6 +180,7 @@ const config: Config = {
   queryEpisodesLimit: parseInt(queryEpisodesLimit, 10),
   queryMediaRefsLimit: parseInt(queryMediaRefsLimit, 10),
   queryPlaylistsLimit: parseInt(queryPlaylistsLimit, 10),
+  queryPodcastListsLimit: parseInt(queryPodcastListsLimit, 10),
   queryPodcastsLimit: parseInt(queryPodcastsLimit, 10),
   queryUsersLimit: parseInt(queryUsersLimit, 10),
   queryUserHistoryItemsLimit: parseInt(queryUserHistoryItemsLimit, 10),

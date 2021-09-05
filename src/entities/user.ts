@@ -4,7 +4,7 @@ import { IsEmail, IsUUID, Validate, ValidateIf } from 'class-validator'
 import { NowPlayingItem } from 'podverse-shared'
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Generated, Index,
   JoinColumn, OneToMany, OneToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm'
-import { BitPayInvoice, MediaRef, PayPalOrder, Playlist, UserHistoryItem, UserQueueItem } from '~/entities'
+import { BitPayInvoice, MediaRef, PayPalOrder, Playlist, PodcastList, UserHistoryItem, UserQueueItem } from '~/entities'
 import { ValidatePassword } from '~/entities/validation/password'
 import { AppStorePurchase } from './appStorePurchase'
 import { GooglePlayPurchase } from './googlePlayPurchase'
@@ -151,6 +151,9 @@ export class User {
 
   @OneToMany(type => Playlist, playlist => playlist.owner)
   playlists: Playlist[]
+
+  @OneToMany(type => PodcastList, podcastList => podcastList.owner)
+  podcastLists: PodcastList[]
 
   @OneToMany(type => UserHistoryItem, userHistoryItem => userHistoryItem.owner)
   userHistoryItems: UserHistoryItem[]

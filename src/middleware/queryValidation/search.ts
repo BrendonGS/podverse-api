@@ -93,6 +93,18 @@ const validatePlaylistSearch = async (ctx, next) => {
   await validateBaseQuery(schema, ctx, next)
 }
 
+const validatePodcastListSearch = async (ctx, next) => {
+  const schema = Joi.object().keys({
+    podcastListId: Joi.string(),
+    page: Joi.number().integer().min(0),
+    skip: Joi.number().integer().min(0),
+    sort: Joi.string(),
+    take: Joi.number().integer().min(0)
+  })
+
+  await validateBaseQuery(schema, ctx, next)
+}
+
 const validatePodcastSearch = async (ctx, next) => {
   const schema = Joi.object().keys({
     categories: Joi.string(),
@@ -130,6 +142,7 @@ export {
   validateFeedUrlSearch,
   validateMediaRefSearch,
   validatePlaylistSearch,
+  validatePodcastListSearch,
   validatePodcastSearch,
   validateUserSearch
 }

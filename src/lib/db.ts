@@ -2,7 +2,7 @@ import { createConnection, ConnectionOptions } from 'typeorm'
 import { config } from '~/config'
 import { AccountClaimToken, AppStorePurchase, Author, BitPayInvoice, Category,
   Episode, FeedUrl, GooglePlayPurchase,  MediaRef, PayPalOrder, Playlist,
-  Podcast, RecentEpisodeByCategory, RecentEpisodeByPodcast, User,
+  Podcast, PodcastList, RecentEpisodeByCategory, RecentEpisodeByPodcast, User,
   UserHistoryItem, UserNowPlayingItem, UserQueueItem } from '~/entities'
 
 const entities = [
@@ -18,6 +18,7 @@ const entities = [
   PayPalOrder,
   Playlist,
   Podcast,
+  PodcastList,
   RecentEpisodeByCategory,
   RecentEpisodeByPodcast,
   User,

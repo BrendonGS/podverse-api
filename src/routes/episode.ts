@@ -38,6 +38,18 @@ router.get('/',
   }
 )
 
+//Get episodes by podcast id's
+router.post('/podcast-ids',
+  async ctx => {
+    try {
+      const episodes = await getEpisodesByPodcastIds(ctx.request.body)
+      ctx.body = episodes
+    } catch (error) {
+      emitRouterError(error, ctx)
+    }
+  }
+)
+
 // Get
 router.get('/:id',
   parseNSFWHeader,
