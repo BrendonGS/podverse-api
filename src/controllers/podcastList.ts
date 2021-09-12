@@ -1,20 +1,20 @@
 import { getRepository } from 'typeorm'
-import { PodcastList } from '~/entities'
-// import { validateClassOrThrow } from '~/lib/errors'
+import { Podcast, PodcastList } from '~/entities'
+import { validateClassOrThrow } from '~/lib/errors'
 // import { getUserSubscribedPlaylistIds } from './user'
-// const createError = require('http-errors')
+const createError = require('http-errors')
 
-// const createPlaylist = async (obj) => {
-//   const repository = getRepository(Playlist)
-//   const playlist = new Playlist()
-//   const newPlaylist = Object.assign(playlist, obj)
+const createPodcastList = async (obj) => {
+  const repository = getRepository(PodcastList)
+  const podcastList = new PodcastList()
+  const newPodcastList = Object.assign(podcastList, obj)
 
-//   await validateClassOrThrow(newPlaylist)
+  await validateClassOrThrow(newPodcastList)
 
-//   await repository.save(newPlaylist)
-//   return newPlaylist
-// }
-
+  await repository.save(newPodcastList)
+  return newPodcastList
+}
+// update deletePlaylist on your own time 
 // const deletePlaylist = async (id, loggedInUserId) => {
 //   const repository = getRepository(Playlist)
 //   const playlist = await repository.findOne({
@@ -37,9 +37,7 @@ import { PodcastList } from '~/entities'
 // }
 
 // const getPlaylist = async id => {
-//   const relations = [
-//     'episodes', 'episodes.podcast',
-//     'mediaRefs', 'mediaRefs.episode', 'mediaRefs.episode.podcast',
+//   const relations = ['podcasts'
 //     'owner'
 //   ]
 //   const repository = getRepository(Playlist)
@@ -64,7 +62,6 @@ import { PodcastList } from '~/entities'
 
 const getPodcastLists = async (query) => {
   const repository = getRepository(PodcastList)
-
   if (query.podcastListId && query.podcastListId.split(',').length > 1) {
     query.id = query.podcastListId.split(',')
   } else if (query.podcastListId) {
@@ -72,7 +69,6 @@ const getPodcastLists = async (query) => {
   } else {
     return []
   }
-
   const podcastLists = await repository
     .createQueryBuilder('podcastList')
     .select('podcastList.id')
@@ -125,81 +121,61 @@ const getPodcastLists = async (query) => {
 //   return newPlaylist
 // }
 
-// const addOrRemovePlaylistItem = async (playlistId, mediaRefId, episodeId, loggedInUserId) => {
-//   const relations = [
-//     'episodes', 'episodes.podcast',
-//     'mediaRefs', 'mediaRefs.episode', 'mediaRefs.episode.podcast',
-//     'owner'
-//   ]
-//   const repository = getRepository(Playlist)
-//   const playlist = await repository.findOne(
-//     {
-//       where: {
-//         id: playlistId
-//       },
-//       relations
-//     }
-//   )
+const addOrRemovePodcastListItem = async (podcastListId, podcastId, loggedInUserId) => {
+  const relations = [
+    'podcasts', 
+    'owner'
+  ]
+  const repository = getRepository(PodcastList)
+  const podcastList = await repository.findOne(
+    {
+      where: {
+        id: podcastListId
+      },
+      relations
+    }
+  )
 
-//   if (!playlist) {
-//     throw new createError.NotFound('Playlist not found')
-//   }
+  if (!podcastList) {
+    throw new createError.NotFound('PodcastList not found')
+  }
 
-//   if (!loggedInUserId || playlist.owner.id !== loggedInUserId) {
-//     throw new createError.Unauthorized('Log in to delete this playlist')
-//   }
+  if (!loggedInUserId || podcastList.owner.id !== loggedInUserId) {
+    throw new createError.Unauthorized('Log in to delete this podcastList')
+  }
 
-//   const itemsOrder = playlist.itemsOrder
-//   let actionTaken = 'removed'
+  const itemsOrder = podcastList.itemsOrder
+  let actionTaken = 'removed'
 
-//   if (mediaRefId) {
-//     // If no mediaRefs match filter, add the playlist item.
-//     // Else, remove the playlist item.
-//     const filteredMediaRefs = playlist.mediaRefs.filter(x => x.id !== mediaRefId)
+  if (podcastId) {
+    // If no podcasts match filter, add the podcast item.
+    // Else, remove the podcast item.
+    const filteredPodcasts = podcastList.podcasts.filter(x => x.id !== podcastId)
 
-//     if (filteredMediaRefs.length === playlist.mediaRefs.length) {
-//       const mediaRefRepository = getRepository(MediaRef)
-//       const mediaRef = await mediaRefRepository.findOne({ id: mediaRefId })
-//       if (mediaRef) {
-//         playlist.mediaRefs.push(mediaRef)
-//         actionTaken = 'added'
-//       } else {
-//         throw new createError.NotFound('MediaRef not found')
-//       }
-//     } else {
-//       playlist.mediaRefs = filteredMediaRefs
-//     }
+    if (filteredPodcasts.length === podcastList.podcasts.length) {
+      const podcastRepository = getRepository(Podcast)
+      const podcast = await podcastRepository.findOne({ id: podcastId })
+      if (podcast) {
+        podcastList.podcasts.push(podcast)
+        actionTaken = 'added'
+      } else {
+        throw new createError.NotFound('Podcast not found')
+      }
+    } else {
+      podcastList.podcasts = filteredPodcasts
+    }
 
-//     playlist.itemsOrder = itemsOrder.filter(x => x !== mediaRefId)
-//   } else if (episodeId) {
-//     // If no episodes match filter, add the playlist item.
-//     // Else, remove the playlist item.
-//     const filteredEpisodes = playlist.episodes.filter(x => x.id !== episodeId)
+    podcastList.itemsOrder = itemsOrder.filter(x => x !== podcastId)
+  } else {
+    throw new createError.NotFound('Must provide a Podcast id')
+  }
 
-//     if (filteredEpisodes.length === playlist.episodes.length) {
-//       const episodeRepository = getRepository(Episode)
-//       const episode = await episodeRepository.findOne({ id: episodeId })
-//       if (episode) {
-//         playlist.episodes.push(episode)
-//         actionTaken = 'added'
-//       } else {
-//         throw new createError.NotFound('Episode not found')
-//       }
-//     } else {
-//       playlist.episodes = filteredEpisodes
-//     }
+  await validateClassOrThrow(podcastList)
 
-//     playlist.itemsOrder = itemsOrder.filter(x => x !== episodeId)
-//   } else {
-//     throw new createError.NotFound('Must provide a MediaRef or Episode id')
-//   }
+  const saved = await repository.save(podcastList)
 
-//   await validateClassOrThrow(playlist)
-
-//   const saved = await repository.save(playlist)
-
-//   return [saved, actionTaken]
-// }
+  return [saved, actionTaken]
+}
 
 // const toggleSubscribeToPlaylist = async (playlistId, loggedInUserId) => {
 
@@ -247,11 +223,11 @@ const getPodcastLists = async (query) => {
 // }
 
 export {
-//   addOrRemovePlaylistItem,
-//   createPlaylist,
+    addOrRemovePodcastListItem,
+    createPodcastList,
 //   deletePlaylist,
 //   getPlaylist,
-  getPodcastLists,
+    getPodcastLists,
 //   getSubscribedPlaylists,
 //   toggleSubscribeToPlaylist,
 //   updatePlaylist

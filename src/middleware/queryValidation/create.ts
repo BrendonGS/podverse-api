@@ -68,6 +68,18 @@ const validatePlaylistCreate = async (ctx, next) => {
   await validateBaseBody(schema, ctx, next)
 }
 
+const validatePodcastListCreate = async (ctx, next) => {
+  const schema = Joi.object().keys({
+    description: Joi.string().allow(null).allow(''),
+    isPublic: Joi.boolean(),
+    itemsOrder: Joi.array().items(Joi.string()),
+    podcasts: Joi.array().items(Joi.string()),
+    title: Joi.string().allow(null).allow('')
+  })
+
+  await validateBaseBody(schema, ctx, next)
+}
+
 export {
   validateAppStorePurchaseCreate,
   validateBitPayInvoiceCreate,
@@ -75,5 +87,6 @@ export {
   validateFeedUrlCreate,
   validateMediaRefCreate,
   validatePayPalOrderCreate,
-  validatePlaylistCreate
+  validatePlaylistCreate,
+  validatePodcastListCreate
 }
