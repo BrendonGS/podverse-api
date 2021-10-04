@@ -1,7 +1,8 @@
 import * as bodyParser from 'koa-bodyparser'
 import * as Router from 'koa-router'
 import { config } from '~/config'
-import { createPodcastList, getPodcastLists } from '~/controllers/podcastList'
+import { createPodcastList, deletePodcastList, getPodcastList,
+  getPodcastLists, updatePodcastList } from '~/controllers/podcastList'
 import { emitRouterError } from '~/lib/errors'
 // import { delimitQueryValues } from '~/lib/utility'
 // import { addOrRemovePlaylistItem, createPlaylist, deletePlaylist, getPlaylist, getPlaylists,
@@ -12,7 +13,7 @@ import { parseNSFWHeader } from '~/middleware/parseNSFWHeader'
 import { parseQueryPageOptions } from '~/middleware/parseQueryPageOptions'
 import { validatePodcastListCreate } from '~/middleware/queryValidation/create'
 import { validatePodcastListSearch } from '~/middleware/queryValidation/search'
-// import { validatePlaylistUpdate } from '~/middleware/queryValidation/update'
+import { validatePodcastListUpdate } from '~/middleware/queryValidation/update'
 import { hasValidMembership } from '~/middleware/hasValidMembership'
 
 const RateLimit = require('koa2-ratelimit').RateLimit
@@ -59,18 +60,18 @@ router.get('/',
 //     }
 //   })
 
-// Get (try on your own time)
-// router.get('/:id',
-//   parseNSFWHeader,
-//   async ctx => {
-//     try {
-//       const playlist = await getPlaylist(ctx.params.id)
+// Get 
+router.get('/:id',
+  parseNSFWHeader,
+  async ctx => {
+    try {
+      const podcastList = await getPodcastList(ctx.params.id)
 
-//       ctx.body = playlist
-//     } catch (error) {
-//       emitRouterError(error, ctx)
-//     }
-//   })
+      ctx.body = podcastList
+    } catch (error) {
+      emitRouterError(error, ctx)
+    }
+  })
 
 // Create
 const createPodcastListLimiter = RateLimit.middleware({
@@ -98,38 +99,38 @@ router.post('/',
   })
 
 // Update
-// const updatePlaylistLimiter = RateLimit.middleware({
-//   interval: 1 * 60 * 1000,
-//   max:  rateLimiterMaxOverride || 20,
-//   message: `You're doing that too much. Please try again in a minute.`,
-//   prefixKey: 'patch/playlist'
-// })
+const updatePodcastListLimiter = RateLimit.middleware({
+  interval: 1 * 60 * 1000,
+  max:  rateLimiterMaxOverride || 20,
+  message: `You're doing that too much. Please try again in a minute.`,
+  prefixKey: 'patch/podcast-list'
+})
 
-// router.patch('/',
-//   validatePlaylistUpdate,
-//   updatePlaylistLimiter,
-//   jwtAuth,
-//   async ctx => {
-//     try {
-//       const body = ctx.request.body
-//       const playlist = await updatePlaylist(body, ctx.state.user.id)
-//       ctx.body = playlist
-//     } catch (error) {
-//       emitRouterError(error, ctx)
-//     }
-//   })
+router.patch('/',
+  validatePodcastListUpdate,
+  updatePodcastListLimiter,
+  jwtAuth,
+  async ctx => {
+    try {
+      const body = ctx.request.body
+      const podcastList = await updatePodcastList(body, ctx.state.user.id)
+      ctx.body = podcastList
+    } catch (error) {
+      emitRouterError(error, ctx)
+    }
+  })
 
-// Delete (try on your own time)
-// router.delete('/:id',
-//   jwtAuth,
-//   async ctx => {
-//     try {
-//       await deletePlaylist(ctx.params.id, ctx.state.user.id)
-//       ctx.status = 200
-//     } catch (error) {
-//       emitRouterError(error, ctx)
-//     }
-//   })
+// Delete
+router.delete('/:id',
+  jwtAuth,
+  async ctx => {
+    try {
+      await deletePodcastList(ctx.params.id, ctx.state.user.id)
+      ctx.status = 200
+    } catch (error) {
+      emitRouterError(error, ctx)
+    }
+  })
 
 // Add/remove mediaRef/episode to/from playlist
 const addOrRemovePodcastListLimiter = RateLimit.middleware({

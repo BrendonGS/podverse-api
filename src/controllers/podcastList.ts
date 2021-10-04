@@ -14,45 +14,45 @@ const createPodcastList = async (obj) => {
   await repository.save(newPodcastList)
   return newPodcastList
 }
-// update deletePlaylist on your own time 
-// const deletePlaylist = async (id, loggedInUserId) => {
-//   const repository = getRepository(Playlist)
-//   const playlist = await repository.findOne({
-//     where: {
-//       id
-//     },
-//     relations: ['owner']
-//   })
+const deletePodcastList = async (id, loggedInUserId) => {
+  const repository = getRepository(PodcastList)
+  const podcastList = await repository.findOne({
+    where: {
+      id
+    },
+    relations: ['owner']
+  })
 
-//   if (!playlist) {
-//     throw new createError.NotFound('Playlist not found')
-//   }
+  if (!podcastList) {
+    throw new createError.NotFound('PodcastList not found')
+  }
 
-//   if (playlist.owner.id !== loggedInUserId) {
-//     throw new createError.Unauthorized('Log in to delete this playlist')
-//   }
+  if (podcastList.owner.id !== loggedInUserId) {
+    throw new createError.Unauthorized('Log in to delete this podcastList')
+  }
 
-//   const result = await repository.remove(playlist)
-//   return result
-// }
+  const result = await repository.remove(podcastList)
+  return result
+}
 
-// const getPlaylist = async id => {
-//   const relations = ['podcasts'
-//     'owner'
-//   ]
-//   const repository = getRepository(Playlist)
-//   const playlist = await repository.findOne({ id }, { relations })
+const getPodcastList = async id => {
+  const relations = [
+    'podcasts',
+    'owner'
+  ]
+  const repository = getRepository(PodcastList)
+  const podcastList = await repository.findOne({ id }, { relations })
 
-//   if (!playlist) {
-//     throw new createError.NotFound('Playlist not found')
-//   }
+  if (!podcastList) {
+    throw new createError.NotFound('PodcastList not found')
+  }
 
-//   if (!playlist.owner.isPublic) {
-//     delete playlist.owner.name
-//   }
+  if (!podcastList.owner.isPublic) {
+    delete podcastList.owner.name
+  }
 
-//   return playlist
-// }
+  return podcastList
+}
 
 // const getSubscribedPlaylists = async (query, loggedInUserId) => {
 //   const subscribedPlaylistIds = await getUserSubscribedPlaylistIds(loggedInUserId)
@@ -89,37 +89,36 @@ const getPodcastLists = async (query) => {
   return podcastLists
 }
 
-// const updatePlaylist = async (obj, loggedInUserId) => {
-//   const relations = [
-//     'episodes', 'episodes.podcast',
-//     'mediaRefs', 'mediaRefs.episode', 'mediaRefs.episode.podcast',
-//     'owner'
-//   ]
-//   const repository = getRepository(Playlist)
+const updatePodcastList = async (obj, loggedInUserId) => {
+  const relations = [
+    'podcasts',
+    'owner'
+  ]
+  const repository = getRepository(PodcastList)
 
-//   const playlist = await repository.findOne({
-//     where: {
-//       id: obj.id
-//     },
-//     relations
-//   })
+  const podcastList = await repository.findOne({
+    where: {
+      id: obj.id
+    },
+    relations
+  })
 
-//   if (!playlist) {
-//     throw new createError.NotFound('Playlist not found')
-//   }
+  if (!podcastList) {
+    throw new createError.NotFound('PodcastList not found')
+  }
 
-//   if (playlist.owner.id !== loggedInUserId) {
-//     throw new createError.Unauthorized('Log in to delete this playlist')
-//   }
+  if (podcastList.owner.id !== loggedInUserId) {
+    throw new createError.Unauthorized('Log in to delete this podcastList')
+  }
 
-//   const newPlaylist = Object.assign(playlist, obj)
+  const newPodcastList = Object.assign(podcastList, obj)
 
-//   await validateClassOrThrow(newPlaylist)
+  await validateClassOrThrow(newPodcastList)
 
-//   await repository.save(newPlaylist)
+  await repository.save(newPodcastList)
 
-//   return newPlaylist
-// }
+  return newPodcastList
+}
 
 const addOrRemovePodcastListItem = async (podcastListId, podcastId, loggedInUserId) => {
   const relations = [
@@ -225,10 +224,10 @@ const addOrRemovePodcastListItem = async (podcastListId, podcastId, loggedInUser
 export {
     addOrRemovePodcastListItem,
     createPodcastList,
-//   deletePlaylist,
-//   getPlaylist,
+    deletePodcastList,
+    getPodcastList,
     getPodcastLists,
 //   getSubscribedPlaylists,
 //   toggleSubscribeToPlaylist,
-//   updatePlaylist
+    updatePodcastList
 }

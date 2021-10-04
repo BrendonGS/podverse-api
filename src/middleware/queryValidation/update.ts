@@ -51,6 +51,20 @@ const validatePlaylistUpdate = async (ctx, next) => {
   await validateBaseBody(schema, ctx, next)
 }
 
+const validatePodcastListUpdate = async (ctx, next) => {
+  const schema = Joi.object().keys({
+    description: Joi.string().allow(null).allow(''),
+    id: Joi.string().min(7).max(14).required(),
+    isPublic: Joi.boolean(),
+    itemsOrder: Joi.array().items(Joi.string()),
+    podcasts: Joi.array().items(Joi.string()),
+    ownerId: Joi.string(),
+    title: Joi.string().allow(null).allow('')
+  })
+
+  await validateBaseBody(schema, ctx, next)
+}
+
 const validateUserMembershipUpdate = async (ctx, next) => {
   const schema = Joi.object().keys({
     id: Joi.string().min(7).max(14).required(),
@@ -118,6 +132,7 @@ export {
   validateMediaRefUpdate,
   validatePayPalOrderUpdate,
   validatePlaylistUpdate,
+  validatePodcastListUpdate,
   validateAddOrUpdateUserHistoryItem,
   validateAddOrUpdateUserQueueItem,
   validateUserHistoryItemRemove,
