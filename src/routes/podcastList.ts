@@ -1,13 +1,12 @@
 import * as bodyParser from 'koa-bodyparser'
 import * as Router from 'koa-router'
 import { config } from '~/config'
-import { createPodcastList, deletePodcastList, getPodcastList,
-  getPodcastLists, updatePodcastList } from '~/controllers/podcastList'
+import { addOrRemovePodcastListItem, createPodcastList, deletePodcastList, getPodcastList,
+  getPodcastLists, toggleSubscribeToPodcastList, updatePodcastList } from '~/controllers/podcastList'
 import { emitRouterError } from '~/lib/errors'
 // import { delimitQueryValues } from '~/lib/utility'
 // import { addOrRemovePlaylistItem, createPlaylist, deletePlaylist, getPlaylist, getPlaylists,
 //   getSubscribedPlaylists, toggleSubscribeToPlaylist, updatePlaylist } from '~/controllers/playlist'
-import { addOrRemovePodcastListItem } from '~/controllers/podcastList'
 import { jwtAuth } from '~/middleware/auth/jwtAuth'
 import { parseNSFWHeader } from '~/middleware/parseNSFWHeader'
 import { parseQueryPageOptions } from '~/middleware/parseQueryPageOptions'
@@ -163,24 +162,24 @@ router.patch('/add-or-remove',
   })
 
 // Toggle subscribe to playlist
-// const toggleSubscribeLimiter = RateLimit.middleware({
-//   interval: 1 * 60 * 1000,
-//   max:  rateLimiterMaxOverride || 15,
-//   message: `You're doing that too much. Please try again in a minute.`,
-//   prefixKey: 'get/playlist/toggle-subscribe'
-// })
+const toggleSubscribeLimiter = RateLimit.middleware({
+  interval: 1 * 60 * 1000,
+  max:  rateLimiterMaxOverride || 15,
+  message: `You're doing that too much. Please try again in a minute.`,
+  prefixKey: 'get/podcast-list/toggle-subscribe'
+})
 
-// router.get('/toggle-subscribe/:id',
-//   toggleSubscribeLimiter,
-//   jwtAuth,
-//   hasValidMembership,
-//   async ctx => {
-//     try {
-//       const subscribedPlaylistIds = await toggleSubscribeToPlaylist(ctx.params.id, ctx.state.user.id)
-//       ctx.body = subscribedPlaylistIds
-//     } catch (error) {
-//       emitRouterError(error, ctx)
-//     }
-//   })
+router.get('/toggle-subscribe/:id',
+  toggleSubscribeLimiter,
+  jwtAuth,
+  hasValidMembership,
+  async ctx => {
+    try {
+      const subscribedPodcastListIds = await toggleSubscribeToPodcastList(ctx.params.id, ctx.state.user.id)
+      ctx.body = subscribedPodcastListIds
+    } catch (error) {
+      emitRouterError(error, ctx)
+    }
+  })
 
 export const podcastListRouter = router

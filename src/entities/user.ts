@@ -119,6 +119,13 @@ export class User {
     default: () => 'array[]::text[]',
     select: false
   })
+  subscribedPodcastListIds: string[]
+
+  @Column('varchar', {
+    array: true,
+    default: () => 'array[]::text[]',
+    select: false
+  })
   subscribedPodcastIds: string[]
 
   @Column('varchar', {

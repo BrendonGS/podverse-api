@@ -1,5 +1,5 @@
 import { getRepository } from 'typeorm'
-import { Podcast, PodcastList } from '~/entities'
+import { Podcast, PodcastList, User } from '~/entities'
 import { validateClassOrThrow } from '~/lib/errors'
 // import { getUserSubscribedPlaylistIds } from './user'
 const createError = require('http-errors')
@@ -176,50 +176,50 @@ const addOrRemovePodcastListItem = async (podcastListId, podcastId, loggedInUser
   return [saved, actionTaken]
 }
 
-// const toggleSubscribeToPlaylist = async (playlistId, loggedInUserId) => {
+const toggleSubscribeToPodcastList = async (podcastListId, loggedInUserId) => {
 
-//   if (!loggedInUserId) {
-//     throw new createError.Unauthorized('Log in to subscribe to this playlist')
-//   }
+  if (!loggedInUserId) {
+    throw new createError.Unauthorized('Log in to subscribe to this podcastList')
+  }
 
-//   const playlist = await getPlaylist(playlistId)
+  const podcastList = await getPodcastList(podcastListId)
 
-//   if (playlist.owner.id === loggedInUserId) {
-//     throw new createError.BadRequest('Cannot subscribe to your own playlist')
-//   }
+  if (podcastList.owner.id === loggedInUserId) {
+    throw new createError.BadRequest('Cannot subscribe to your own podcastList')
+  }
 
-//   const repository = getRepository(User)
-//   const user = await repository.findOne(
-//     {
-//       where: {
-//         id: loggedInUserId
-//       },
-//       select: [
-//         'id',
-//         'subscribedPlaylistIds'
-//       ]
-//     }
-//   )
+  const repository = getRepository(User)
+  const user = await repository.findOne(
+    {
+      where: {
+        id: loggedInUserId
+      },
+      select: [
+        'id',
+        'subscribedPodcastListIds'
+      ]
+    }
+  )
 
-//   if (!user) {
-//     throw new createError.NotFound('User not found')
-//   }
+  if (!user) {
+    throw new createError.NotFound('User not found')
+  }
 
-//   let subscribedPlaylistIds = user.subscribedPlaylistIds
+  let subscribedPodcastListIds = user.subscribedPodcastListIds
 
-//   // If no playlistIds match the filter, add the playlistId.
-//   // Else, remove the playlistId.
-//   const filteredPlaylists = user.subscribedPlaylistIds.filter(x => x !== playlistId)
-//   if (filteredPlaylists.length === user.subscribedPlaylistIds.length) {
-//     subscribedPlaylistIds.push(playlistId)
-//   } else {
-//     subscribedPlaylistIds = filteredPlaylists
-//   }
+  // If no podcastListIds match the filter, add the podcastListId.
+  // Else, remove the podcastListId.
+  const filteredPodcastLists = user.subscribedPodcastListIds.filter(x => x !== podcastListId)
+  if (filteredPodcastLists.length === user.subscribedPodcastListIds.length) {
+    subscribedPodcastListIds.push(podcastListId)
+  } else {
+    subscribedPodcastListIds = filteredPodcastLists
+  }
 
-//   await repository.update(loggedInUserId, { subscribedPlaylistIds })
+  await repository.update(loggedInUserId, { subscribedPodcastListIds })
 
-//   return subscribedPlaylistIds
-// }
+  return subscribedPodcastListIds
+}
 
 export {
     addOrRemovePodcastListItem,
@@ -228,6 +228,6 @@ export {
     getPodcastList,
     getPodcastLists,
 //   getSubscribedPlaylists,
-//   toggleSubscribeToPlaylist,
+    toggleSubscribeToPodcastList,
     updatePodcastList
 }
